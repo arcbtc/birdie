@@ -4,11 +4,14 @@
       <q-form @submit="sendPost">
         <q-input v-model="text" dense label="Say something" maxlength="280">
           <template #before>
-            <q-btn round class="mr-4" @click="toProfile($store.state.keys.pub)">
-              <q-avatar size="42px">
-                <img :src="$store.getters.avatar($store.state.keys.pub)" />
-              </q-avatar>
-            </q-btn>
+            <q-avatar
+             size="42px"
+              round
+              class="cursor-pointer mr-4"
+              @click="toProfile($store.state.keys.pub)"
+            >
+              <img :src="$store.getters.avatar($store.state.keys.pub)" />
+            </q-avatar>
           </template>
         </q-input>
         <div class="flex justify-end mt-3">
@@ -19,6 +22,7 @@
             unelevated
             type="submit"
             color="primary"
+            :disable="!$store.state.keys.priv"
           />
         </div>
       </q-form>

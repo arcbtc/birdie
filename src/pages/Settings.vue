@@ -114,9 +114,11 @@
     </div>
 
     <q-dialog v-model="keysDialog">
-      <q-card class="px-2">
+      <q-card class="px-4 py-2">
         <q-card-section>
-          <div class="text-h6">Your keys <q-icon name="vpn_key" /></div>
+          <div class="text-lg text-bold tracking-wide leading-relaxed py-2">
+            Your keys <q-icon name="vpn_key" />
+          </div>
           <p>
             Make sure you back up your private key! <br />
             <small
@@ -155,6 +157,7 @@
 
 <script>
 import {LocalStorage} from 'quasar'
+import {nextTick} from 'vue'
 
 import helpersMixin from '../utils/mixin'
 import {db} from '../db'
@@ -180,14 +183,34 @@ export default {
   },
 
   mounted() {
+    if (this.$route.params.showKeys) this.keysDialog = true
+
     this.unsubscribe = this.$store.subscribe((mutation, state) => {
-      if (mutation.type !== 'addProfileToCache') return
+      switch (mutation.type) {
+        case 'addProfileToCache': {
+          const {name, picture, about} =
+            state.profilesCache[state.keys.pub] || {}
 
-      const {name, picture, about} = state.profilesCache[state.keys.pub] || {}
+          nextTick(() => {
+            setTimeout(() => {
+              if (!this.metadata.name && name) this.metadata.name = name
+              if (!this.metadata.picture && picture)
+                this.metadata.picture = picture
+              if (!this.metadata.about && about) this.metadata.about = about
+            }, 1)
+          })
 
-      if (!this.metadata.name && name) this.metadata.name = name
-      if (!this.metadata.picture && picture) this.metadata.picture = picture
-      if (!this.metadata.about && about) this.metadata.about = about
+          break
+        }
+        case 'setKeys': {
+          nextTick(() => {
+            setTimeout(() => {
+              this.keysDialog = true
+            }, 1)
+          })
+          break
+        }
+      }
     })
   },
 
