@@ -4,6 +4,8 @@ A very slightly changed fork off https://github.com/fiatjaf/branle
 
 Feel free to use <a href="https://nostr.com">nostr.com</a>, or run yourself.
 
+> nostr.com is just a dot com with the protocols name. The nostr protocol is very diverse and can do much more than just twitter. Read more <a href="https://github.com/fiatjaf/nostr">here</a> 
+
 ## Installation
 
 #### Install yarn and the dependencies
