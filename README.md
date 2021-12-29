@@ -23,6 +23,8 @@ yarn
 
 ```bash
 yarn global add @quasar/cli
+export PATH="$(yarn global bin):$PATH"
+
 ```
 
 ##### Start the app in development mode (hot-code reloading, error reporting, etc.)
