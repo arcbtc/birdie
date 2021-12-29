@@ -4,6 +4,8 @@
 
 a very slightly changed fork off https://github.com/fiatjaf/branle
 
+Feel free to use nostr.com, or run yourself.
+
 ## Install yarn and the dependencies
 
 ```bash
