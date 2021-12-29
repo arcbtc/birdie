@@ -2,7 +2,7 @@
 
 # Birdie
 
-a very slightly changed fork off https://github.com/fiatjaf/branle
+A very slightly changed fork off https://github.com/fiatjaf/branle
 
 Feel free to use <a href="https://nostr.com">nostr.com</a>, or run yourself.
 
