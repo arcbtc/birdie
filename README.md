@@ -1,3 +1,5 @@
+![bird](https://user-images.githubusercontent.com/33088785/147619995-ba503b39-766f-4157-9a77-cd430959524e.png)
+
 # Birdie
 
 a very slightly changed fork off https://github.com/fiatjaf/branle
