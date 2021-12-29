@@ -1,4 +1,4 @@
-![bird](https://user-images.githubusercontent.com/33088785/147619995-ba503b39-766f-4157-9a77-cd430959524e.png)
+<img src="https://user-images.githubusercontent.com/33088785/147619995-ba503b39-766f-4157-9a77-cd430959524e.png" style="width:250px">
 
 # Birdie
 
