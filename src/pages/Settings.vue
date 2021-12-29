@@ -2,6 +2,16 @@
   <q-page class="px-4 py-6">
     <div class="text-xl">Settings</div>
 
+    <div class="my-8">
+      <span class="text-xl"
+        >This decentralised
+        <a href="https://github.com/arcbtc/birdie">twitter-centric</a> platform
+        is just one example of whats possible with
+        <a href="https://github.com/fiatjaf/nostr">NOSTR protocol</a>.
+      </span>
+    </div>
+    <q-separator />
+
     <q-form class="my-8 q-gutter-md" @submit="setMetadata">
       <div class="text-lg p-4">Profile</div>
       <q-input v-model="metadata.name" filled type="text" label="Name">
