@@ -104,7 +104,7 @@
     <q-separator />
 
     <div class="my-8">
-      <q-btn label="Delete Local Storage" color="primary" @click="hardReset" />
+      <q-btn label="Delete Keys" color="primary" @click="hardReset" />
       <q-btn
         class="q-ml-md"
         label="View your keys"
