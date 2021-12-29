@@ -6,7 +6,9 @@ a very slightly changed fork off https://github.com/fiatjaf/branle
 
 Feel free to use <a href="https://nostr.com">nostr.com</a>, or run yourself.
 
-## Install yarn and the dependencies
+## Installation
+
+#### Install yarn and the dependencies
 
 ```bash
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
@@ -17,30 +19,30 @@ sudo apt update && sudo apt install yarn
 yarn
 ```
 
-## Install Quasar
+#### Install Quasar
 
 ```bash
 yarn global add @quasar/cli
 ```
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
+#### Start the app in development mode (hot-code reloading, error reporting, etc.)
 
 ```bash
 quasar dev
 ```
 
-### Lint the files
+#### Lint the files
 
 ```bash
 yarn run lint
 ```
 
-### Build the app for production
+#### Build the app for production
 
 ```bash
 quasar build
 ```
 
-### Customize the configuration
+#### Customize the configuration
 
 See [Configuring quasar.conf.js](https://quasar.dev/quasar-cli/quasar-conf-js).
