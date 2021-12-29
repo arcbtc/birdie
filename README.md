@@ -4,7 +4,7 @@
 
 a very slightly changed fork off https://github.com/fiatjaf/branle
 
-Feel free to use <a src="https://nostr.com">nostr.com</a>, or run yourself.
+Feel free to use <a href="https://nostr.com">nostr.com</a>, or run yourself.
 
 ## Install yarn and the dependencies
 
