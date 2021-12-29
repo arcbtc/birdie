@@ -13,10 +13,8 @@
         <Follow />
       </div>
     </div>
-
     <q-tabs
-      class="w-full sm:hidden fixed bottom-0 left-0 right-0 text-secondary"
-      active-class="px-0"
+      class="w-full sm:hidden fixed bottom-0 bg-dark left-0 right-0 text-secondary"
     >
       <q-route-tab
         icon="home"
