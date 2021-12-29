@@ -1,7 +1,5 @@
 <img src="https://user-images.githubusercontent.com/33088785/147620316-7499cebd-9019-4875-9e71-f569dd568995.png">
 
-# Birdie
-
 A very slightly changed fork off https://github.com/fiatjaf/branle
 
 Feel free to use <a href="https://nostr.com">nostr.com</a>, or run yourself.
