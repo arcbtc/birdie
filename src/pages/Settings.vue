@@ -37,7 +37,7 @@
       <div class="text-lg p-4">Relays</div>
       <q-list class="mb-3" dense>
         <q-item v-for="(opts, url) in $store.state.relays" :key="url">
-          <q-item-section class="text-slate-800">
+          <q-item-section>
             <div class="flex-inline">
               <q-btn
                 round

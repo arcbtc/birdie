@@ -1,5 +1,5 @@
 <template>
-  <q-layout class="bg-lime-100/70">
+  <q-layout>
     <div class="flex">
       <LeftMenu />
 
@@ -15,16 +15,7 @@
     </div>
 
     <q-tabs
-      class="
-        w-full
-        sm:hidden
-        fixed
-        bottom-0
-        left-0
-        right-0
-        bg-lime-100
-        text-secondary
-      "
+      class="w-full sm:hidden fixed bottom-0 left-0 right-0 bg-lime-100 text-secondary"
       active-class="px-0"
     >
       <q-route-tab
@@ -82,3 +73,20 @@ export default {
   }
 }
 </script>
+
+<style lang="sass">
+.my-menu-link
+  color: primary
+body.body--dark
+    background: #1d2d2d
+.small-screen-only
+  @media (max-width: $breakpoint-xs-max)
+    display: block
+  @media (min-width: $breakpoint-sm-min)
+    display: none
+.large-screen-only
+  @media (max-width: $breakpoint-xs-max)
+    display: none
+  @media (min-width: $breakpoint-sm-min)
+    display: block
+</style>

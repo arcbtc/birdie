@@ -5,6 +5,8 @@
 <script>
 export default {
   name: 'App',
-  created() {}
+  created() {
+    this.$q.dark.set(true)
+  }
 }
 </script>
