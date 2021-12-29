@@ -15,7 +15,7 @@
     </div>
 
     <q-tabs
-      class="w-full sm:hidden fixed bottom-0 left-0 right-0 bg-lime-100 text-secondary"
+      class="w-full sm:hidden fixed bottom-0 left-0 right-0 text-secondary"
       active-class="px-0"
     >
       <q-route-tab
