@@ -5,8 +5,8 @@
         <q-input v-model="text" dense label="Say something" maxlength="280">
           <template #before>
             <q-avatar
-             size="42px"
               round
+              size="42px"
               class="cursor-pointer mr-4"
               @click="toProfile($store.state.keys.pub)"
             >
