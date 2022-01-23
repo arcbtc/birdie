@@ -28,7 +28,7 @@
         maxlength="150"
       />
       <q-input
-        v-model="metadata.picture"
+        v-model.trim="metadata.picture"
         filled
         type="text"
         label="Picture URL"
@@ -40,24 +40,38 @@
           </q-avatar>
         </template>
       </q-input>
+      <q-input
+        v-model.trim="metadata.nip05"
+        filled
+        type="text"
+        label="NIP-05 Identifier"
+        maxlength="50"
+      />
       <q-btn label="Save" type="submit" color="primary" />
     </q-form>
     <q-separator />
     <div class="my-8">
       <div class="text-lg p-4">Relays</div>
-      <q-list class="mb-3" dense>
+      <q-list class="mb-3">
         <q-item v-for="(opts, url) in $store.state.relays" :key="url">
-          <q-item-section>
+          <q-item-section class="opacity-75">
             <div class="flex-inline">
               <q-btn
                 round
                 flat
-                color="primary"
+                color="negative"
                 icon="cancel"
                 size="xs"
                 @click="removeRelay(url)"
               />
               {{ url }}
+              <q-btn
+                color="primary"
+                size="sm"
+                label="Share"
+                :disable="hasJustSharedRelay"
+                @click="shareRelay(url)"
+              />
             </div>
           </q-item-section>
           <q-item-section side>
@@ -81,13 +95,7 @@
         </q-item>
       </q-list>
       <q-form @submit="addRelay">
-        <q-input
-          v-model="addingRelay"
-          class="mx-3"
-          filled
-          dense
-          label="Add a relay"
-        >
+        <q-input v-model="addingRelay" class="mx-3" filled label="Add a relay">
           <template #append>
             <q-btn
               label="Add"
@@ -104,7 +112,7 @@
     <q-separator />
 
     <div class="my-8">
-      <q-btn label="Delete Keys" color="primary" @click="hardReset" />
+      <q-btn label="Delete Local Data" color="negative" @click="hardReset" />
       <q-btn
         class="q-ml-md"
         label="View your keys"
@@ -119,23 +127,17 @@
           <div class="text-lg text-bold tracking-wide leading-relaxed py-2">
             Your keys <q-icon name="vpn_key" />
           </div>
-          <p>
-            Make sure you back up your private key! <br />
-            <small
-              >Posts are published using your private key. Others can see your
-              posts or follow you using only your public key.</small
-            >
+          <p v-if="$store.state.keys.priv">
+            Make sure you back up your private key!
           </p>
+          <p v-else>Your private key is not here!</p>
+          <div class="mt-1 text-xs">
+            Posts are published using your private key. Others can see your
+            posts or follow you using only your public key.
+          </div>
         </q-card-section>
 
         <q-card-section>
-          <p>Seed Words:</p>
-          <q-input
-            v-model="$store.state.keys.mnemonic"
-            class="mb-2"
-            readonly
-            filled
-          />
           <p>Private Key:</p>
           <q-input
             v-model="$store.state.keys.priv"
@@ -158,16 +160,17 @@
 <script>
 import {LocalStorage} from 'quasar'
 import {nextTick} from 'vue'
+import {queryName} from 'nostr-tools/nip05'
 
 import helpersMixin from '../utils/mixin'
-import {db} from '../db'
+import {eraseDatabase} from '../db'
 
 export default {
   name: 'Settings',
   mixins: [helpersMixin],
 
   data() {
-    const {name, picture, about} =
+    const {name, picture, about, nip05} =
       this.$store.state.profilesCache[this.$store.state.keys.pub] || {}
 
     return {
@@ -176,9 +179,11 @@ export default {
       metadata: {
         name,
         picture,
-        about
+        about,
+        nip05
       },
-      unsubscribe: null
+      unsubscribe: null,
+      hasJustSharedRelay: false
     }
   },
 
@@ -188,7 +193,7 @@ export default {
     this.unsubscribe = this.$store.subscribe((mutation, state) => {
       switch (mutation.type) {
         case 'addProfileToCache': {
-          const {name, picture, about} =
+          const {name, picture, about, nip05} =
             state.profilesCache[state.keys.pub] || {}
 
           nextTick(() => {
@@ -197,6 +202,7 @@ export default {
               if (!this.metadata.picture && picture)
                 this.metadata.picture = picture
               if (!this.metadata.about && about) this.metadata.about = about
+              if (!this.metadata.nip05 && nip05) this.metadata.nip05 = nip05
             }, 1)
           })
 
@@ -219,7 +225,21 @@ export default {
   },
 
   methods: {
-    setMetadata() {
+    async setMetadata() {
+      if (this.metadata.nip05 === '') this.metadata.nip05 = undefined
+      if (this.metadata.nip05) {
+        if (
+          (await queryName(this.metadata.nip05)) !== this.$store.state.keys.pub
+        ) {
+          this.$q.notify({
+            message: 'Failed to verify NIP05 identifier on server.',
+            color: 'warning'
+          })
+
+          return
+        }
+      }
+
       this.$store.dispatch('setMetadata', this.metadata)
     },
     addRelay() {
@@ -240,6 +260,13 @@ export default {
     setRelayOpt(url, opt, value) {
       this.$store.commit('setRelayOpt', {url, opt, value})
     },
+    shareRelay(url) {
+      this.hasJustSharedRelay = true
+      this.$store.dispatch('recommendServer', url)
+      setTimeout(() => {
+        this.hasJustSharedRelay = false
+      }, 5000)
+    },
     async hardReset() {
       this.$q
         .dialog({
@@ -249,7 +276,7 @@ export default {
         })
         .onOk(async () => {
           LocalStorage.clear()
-          await db.destroy()
+          await eraseDatabase()
           window.location.reload()
         })
     }

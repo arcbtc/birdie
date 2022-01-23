@@ -45,6 +45,19 @@ yarn run lint
 quasar build
 ```
 
-##### Customize the configuration
-
+### Customize the configuration
 See [Configuring quasar.conf.js](https://quasar.dev/quasar-cli/quasar-conf-js).
+
+### Build the docker image
+```bash
+docker build -t branle .
+```
+
+### Run the container
+```bash
+docker run -d -p 8080:80 --name branle branle
+```
+
+### Customize the brand
+Edit `customize.json` and replace the colors, icon, name and dark mode setting.
+When setting the dark mode, you can also set the colors `"dark-page"` and `"dark"`.

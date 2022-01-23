@@ -2,22 +2,16 @@
   <q-form class="px-24" @submit="sendReply">
     <q-input
       v-model="text"
-      dense
       autogrow
+      autofocus
       label="Reply to this note"
       maxlength="280"
+      @keypress.ctrl.enter="sendReply"
     >
     </q-input>
 
     <div class="flex justify-end mt-2">
-      <q-btn
-        :disable="!$store.state.keys.priv"
-        label="Reply"
-        rounded
-        unelevated
-        type="submit"
-        color="primary"
-      />
+      <q-btn label="Reply" rounded unelevated type="submit" color="primary" />
     </div>
   </q-form>
 </template>
@@ -39,7 +33,10 @@ export default {
   },
 
   methods: {
-    sendReply() {
+    async sendReply() {
+      if (!this.text.length) {
+        return
+      }
       // build tags
       let tags = []
 
@@ -59,7 +56,7 @@ export default {
       }
 
       // add the first and the last event ids
-      let first = usableTags.find(([t, v]) => t === 'p')
+      let first = usableTags.find(([t, v]) => t === 'e')
       if (first) {
         let [_, v] = first
         tags.push(['e', v])
@@ -69,11 +66,12 @@ export default {
       // remove ourselves
       tags = tags.filter(([_, v]) => v !== this.$store.state.keys.pub)
 
-      this.$store.dispatch('sendPost', {
+      let ok = await this.$store.dispatch('sendPost', {
         message: this.text,
         tags
       })
-      this.text = ''
+
+      if (ok) this.text = ''
     }
   }
 }

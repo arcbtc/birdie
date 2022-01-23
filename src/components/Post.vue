@@ -4,60 +4,43 @@
   </q-dialog>
 
   <q-item
-    :class="{
-      'transition-colors': true,
-      'py-4': !highlighted,
-      'hover:bg-white/50': !highlighted && item,
-      'py-6': highlighted,
-      'bg-white/70': highlighted
-    }"
+    class="
+      overflow-hidden
+      transition-colors
+      py-3
+      hover:bg-white-100/30
+      border-gray-150
+    "
     :style="{backgroundColor: highlighted ? 'rgba(255, 255, 255, 0.7)' : null}"
   >
-    <q-item-section avatar>
+    <q-item-section avatar style="height: 100%">
+      <div v-if="showVerticalLineTop" class="is-reply"></div>
       <q-avatar
         class="no-shadow cursor-pointer"
         @click="toProfile(event.pubkey)"
       >
         <img :src="$store.getters.avatar(event.pubkey)" />
       </q-avatar>
+      <div v-if="showVerticalLineBottom" class="has-reply"></div>
     </q-item-section>
 
     <q-item-section>
       <q-item-label lines="1" class="flex justify-between items-center">
         <div class="flex items-center">
-          <div
-            v-if="$store.getters.hasName(event.pubkey)"
-            class="cursor-pointer font-bold text-secondary mr-2"
-            @click="toProfile(event.pubkey)"
-          >
-            {{ $store.getters.displayName(event.pubkey) }}
-          </div>
-          <div class="text-slate-400 font-mono text-xs">
+          <Name :pubkey="event.pubkey" />
+          <div class="text-accent font-mono text-xs">
             {{ shorten(event.pubkey) }}
           </div>
-          <div
-            v-if="standalone && tagged"
-            class="text-emerald-300 text-xs ml-3"
-          >
-            related to
-            <span
-              class="cursor-pointer text-emerald-400 font-bold hover:underline"
-              @click="toEvent(tagged)"
-            >
-              {{ shorten(tagged) }}
-            </span>
-          </div>
         </div>
-        <div class="flex">
-          <div @click="metadataDialog = true">
-            <q-icon
-              size="xs"
-              name="info"
-              class="text-slate-500 cursor-pointer mr-4"
-            />
-          </div>
+        <div class="flex items-center">
+          <q-icon
+            size="xs"
+            name="info"
+            class="opacity-50 cursor-pointer mr-2"
+            @click="metadataDialog = true"
+          />
           <div
-            class="text-slate-500 cursor-pointer hover:underline text-xs"
+            class="opacity-40 cursor-pointer hover:underline text-xs"
             @click="toEvent(event.id)"
           >
             {{ niceDate(event.created_at) }}
@@ -65,12 +48,30 @@
         </div>
       </q-item-label>
       <q-item-label
-        class="break-all pt-1 pl-1 text-base font-sans flex"
-        :class="{'cursor-pointer': item}"
+        v-if="
+          tagged &&
+          (position === 'standalone' ||
+            ((position === 'single' || position === 'first') &&
+              ($route.name === 'home' || $route.name === 'profile')))
+        "
+        class="text-xs"
+      >
+        <span class="opacity-50">in reply to&nbsp;</span>
+        <span
+          class="cursor-pointer text-info font-bold hover:underline"
+          @click="toEvent(tagged)"
+        >
+          {{ shorten(tagged) }}
+        </span>
+      </q-item-label>
+      <q-item-label
+        class="pt-1 text-base font-sans flex break-words text-justify"
+        style="hyphens: auto !important"
+        :class="{'cursor-pointer': $route.params.eventId !== event.id}"
         @mousedown="startClicking"
         @mouseup="finishClicking"
       >
-        <Markdown>
+        <Markdown v-if="event.kind === 1">
           {{ trimmedContent }}
           <template #append>
             <q-icon
@@ -89,6 +90,7 @@
             />
           </template>
         </Markdown>
+        <Recommend v-else-if="event.kind === 2" :url="event.content" />
       </q-item-label>
     </q-item-section>
   </q-item>
@@ -102,8 +104,7 @@ export default {
   props: {
     event: {type: Object, required: true},
     highlighted: {type: Boolean, default: false},
-    standalone: {type: Boolean, default: false},
-    item: {type: Boolean, default: false}
+    position: {type: String, default: 'standalone'}
   },
 
   data() {
@@ -133,17 +134,27 @@ export default {
     },
 
     hasMore() {
-      if (this.event.content.length > 270) return true
+      if (this.event.content.length > 280) return true
       return false
+    },
+
+    showVerticalLineTop() {
+      return this.position === 'middle' || this.position === 'last'
+    },
+
+    showVerticalLineBottom() {
+      return this.position === 'middle' || this.position === 'first'
     }
   },
 
   methods: {
     startClicking() {
+      if (this.event.kind === 2) return
+
       this.clicking = true
       setTimeout(() => {
         this.clicking = false
-      }, 300)
+      }, 200)
     },
 
     finishClicking(ev) {
@@ -154,3 +165,21 @@ export default {
   }
 }
 </script>
+<style type="css" scoped>
+.has-reply {
+  width: 2px;
+  position: absolute;
+  top: 55px;
+  left: 35px;
+  height: 100vh;
+  @apply bg-gray-400;
+}
+.is-reply {
+  width: 2px;
+  position: absolute;
+  top: 0;
+  left: 35px;
+  height: 8px;
+  @apply bg-gray-400;
+}
+</style>

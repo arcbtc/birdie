@@ -5,19 +5,14 @@
     <Publish />
 
     <q-infinite-scroll :disable="reachedEnd" :offset="150" @load="loadMore">
-      <Post
-        v-for="event in homeFeed"
-        :key="event.id"
-        :event="event"
-        standalone
-        item
-      />
+      <Thread v-for="thread in homeFeed" :key="thread[0].id" :events="thread" />
     </q-infinite-scroll>
   </q-page>
 </template>
 
 <script>
 import helpersMixin from '../utils/mixin'
+import {addToThread} from '../utils/threads'
 import {dbGetHomeFeedNotes, onNewHomeFeedNote} from '../db'
 
 export default {
@@ -28,18 +23,27 @@ export default {
     return {
       listener: null,
       reachedEnd: false,
-      homeFeed: []
+      homeFeed: [],
+      notesSet: new Set()
     }
   },
 
   async mounted() {
-    this.homeFeed = await dbGetHomeFeedNotes(50)
-    if (this.homeFeed.length > 0) {
+    let notes = await dbGetHomeFeedNotes(50)
+    if (notes.length > 0) {
       this.reachedEnd = false
     }
 
+    for (let i = notes.length - 1; i >= 0; i--) {
+      addToThread(this.homeFeed, notes[i])
+      this.notesSet.add(notes[i].id)
+    }
+
     this.listener = onNewHomeFeedNote(event => {
-      this.homeFeed.unshift(event)
+      if (this.notesSet.has(event.id)) return
+
+      addToThread(this.homeFeed, event)
+      this.notesSet.add(event.id)
     })
   },
 
@@ -57,12 +61,18 @@ export default {
 
       let loadedNotes = await dbGetHomeFeedNotes(
         50,
-        this.homeFeed[this.homeFeed.length - 1].created_at - 1
+        Math.min.apply(
+          Math,
+          this.homeFeed.flat().map(event => event.created_at)
+        ) - 1
       )
       if (loadedNotes.length === 0) {
         this.reachedEnd = true
       }
-      this.homeFeed = this.homeFeed.concat(loadedNotes)
+      for (let i = loadedNotes.length - 1; i >= 0; i--) {
+        addToThread(this.homeFeed, loadedNotes[i])
+        this.notesSet.add(event.id)
+      }
       done()
     }
   }

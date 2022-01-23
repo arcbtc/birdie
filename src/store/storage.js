@@ -6,17 +6,11 @@ export default function (store) {
       case 'setKeys':
         LocalStorage.set('keys', state.keys)
         break
-      case 'addRelay':
-      case 'removeRelay':
-      case 'setRelayOpt':
-        LocalStorage.set('relays', state.relays)
-        break
-      case 'follow':
-      case 'unfollow':
-        LocalStorage.set('following', state.following)
-        break
       case 'haveReadNotifications':
         LocalStorage.set('lastNotificationRead', state.lastNotificationRead)
+        break
+      case 'haveReadMessage':
+        LocalStorage.set('lastMessageRead', state.lastMessageRead)
         break
     }
   })

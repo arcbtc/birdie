@@ -1,10 +1,137 @@
 <template>
   <q-layout>
     <div class="flex">
-      <LeftMenu />
+      <div class="hidden sm:flex w-1/4 justify-center px-8">
+        <q-card flat no-box-shadow class="text-xl bg-inherit">
+          <q-card-section class="flex justify-center">
+            <q-img
+              :src="icon"
+              fit="scale-down"
+              width="80px"
+              @click="$router.push('/')"
+            />
+          </q-card-section>
+          <q-list class="text-slate-700">
+            <q-item v-ripple clickable to="/" active-class="">
+              <q-item-section avatar>
+                <q-icon name="home" color="secondary" />
+              </q-item-section>
+
+              <q-item-section
+                :class="{
+                  'text-primary': $route.name === 'home'
+                }"
+              >
+                Home
+              </q-item-section>
+            </q-item>
+
+            <q-item v-ripple clickable to="/notifications" active-class="">
+              <q-item-section avatar>
+                <q-icon name="notifications" color="secondary" />
+              </q-item-section>
+
+              <q-item-section
+                :class="{'text-primary': $route.name === 'notifications'}"
+              >
+                Notifications
+
+                <q-badge
+                  v-if="$store.state.unreadNotifications"
+                  color="primary"
+                  floating
+                  transparent
+                >
+                  {{ $store.state.unreadNotifications }}
+                </q-badge>
+              </q-item-section>
+            </q-item>
+
+            <q-item
+              v-if="!!$store.state.keys.priv"
+              v-ripple
+              clickable
+              to="/messages"
+              active-class=""
+            >
+              <q-item-section avatar>
+                <q-icon name="email" color="secondary" />
+              </q-item-section>
+
+              <q-item-section
+                :class="{'text-primary': $route.name === 'messages'}"
+              >
+                Messages
+
+                <q-badge
+                  v-if="$store.getters.unreadChats"
+                  color="primary"
+                  floating
+                  transparent
+                >
+                  {{ $store.getters.unreadChats }}
+                </q-badge>
+              </q-item-section>
+            </q-item>
+
+            <q-item
+              v-ripple
+              clickable
+              :to="'/' + $store.state.keys.pub"
+              active-class=""
+            >
+              <q-item-section avatar>
+                <q-icon name="person" color="secondary" />
+              </q-item-section>
+
+              <q-item-section
+                :class="{
+                  'text-primary':
+                    $route.name === 'profile' &&
+                    $route.params.pubkey === $store.state.keys.pub
+                }"
+              >
+                Profile
+              </q-item-section>
+            </q-item>
+
+            <q-item
+              v-ripple
+              clickable
+              to="/follow"
+              active-class=""
+              class="lg:hidden"
+            >
+              <q-item-section avatar>
+                <q-icon name="manage_search" color="secondary" />
+              </q-item-section>
+
+              <q-item-section
+                :class="{
+                  'text-primary': $route.name === 'follow'
+                }"
+              >
+                Search and Follows
+              </q-item-section>
+            </q-item>
+
+            <q-item v-ripple clickable to="/settings" active-class="">
+              <q-item-section avatar>
+                <q-icon name="settings" color="secondary" />
+              </q-item-section>
+
+              <q-item-section
+                :class="{'text-primary': $route.name === 'settings'}"
+              >
+                Settings
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card>
+      </div>
 
       <div class="w-full sm:w-3/4 lg:w-2/4 pl-4">
-        <q-page-container>
+        <q-page-container v-if="$store.state.keys.pub">
           <router-view />
         </q-page-container>
       </div>
@@ -36,14 +163,32 @@
         to="/notifications"
         active-class=""
         :class="{'text-primary': $route.name === 'notifications'}"
-      />
+      >
+        <q-badge
+          v-if="$store.state.unreadNotifications"
+          color="primary"
+          floating
+          transparent
+        >
+          {{ $store.state.unreadNotifications }}
+        </q-badge>
+      </q-route-tab>
       <q-route-tab
         v-if="!!$store.state.keys.priv"
         icon="email"
         to="/messages"
         active-class=""
         :class="{'text-primary': $route.name === 'messages'}"
-      />
+      >
+        <q-badge
+          v-if="$store.getters.unreadChats"
+          color="primary"
+          floating
+          transparent
+        >
+          {{ $store.getters.unreadChats }}
+        </q-badge>
+      </q-route-tab>
       <q-route-tab
         icon="person"
         :to="'/' + $store.state.keys.pub"
@@ -74,21 +219,21 @@
           <div class="text-lg text-bold tracking-wide leading-relaxed py-2">
             Initial Key Setup
           </div>
-          <p>
-            Type your mnemonic seed from a previous Nostr account or generate a
+          <div class="mb-2">
+            Type your private key from a previous Nostr account or generate a
             new one.
-          </p>
-          <p>
-            You can also type a raw private key or just a public key for a
-            watch-only setup.
-          </p>
-        </q-card-section>
-        <q-card-section>
+          </div>
+          <div>
+            You can also type just a public key and later sign events manually
+            or using a Nostr-capable browser extension.
+          </div>
+
           <q-form @submit="proceed">
             <q-input
               v-model="key"
               autogrow
-              label="BIP39 Seed Words, private key or public key"
+              autofocus
+              label="Private key or public key"
               class="text-lg"
             />
             <q-toggle
@@ -98,6 +243,11 @@
             />
             <div class="flex w-full mt-4 justify-between">
               <q-btn @click="generate">Generate</q-btn>
+              <q-btn
+                v-if="hasExtension && !isKeyValid"
+                @click="getFromExtension"
+                >Use Public Key from Extension</q-btn
+              >
               <q-btn v-if="isKeyValid" color="primary" @click="proceed"
                 >Proceed</q-btn
               >
@@ -110,7 +260,8 @@
 </template>
 <script>
 import helpersMixin from '../utils/mixin'
-import {generateSeedWords, validateWords} from 'nostr-tools/nip06'
+import {validateWords} from 'nostr-tools/nip06'
+import {generatePrivateKey} from 'nostr-tools'
 
 export default {
   name: 'MainLayout',
@@ -120,11 +271,16 @@ export default {
     return {
       initializeKeys: true,
       watchOnly: false,
-      key: null
+      key: null,
+      hasExtension: false
     }
   },
 
   computed: {
+    icon() {
+      return document.getElementById('icon').href
+    },
+
     isKeyKey() {
       if (this.isKey(this.key)) return true
       return false
@@ -137,16 +293,37 @@ export default {
     }
   },
 
-  created: function () {
-    if (this.$store.state.keys.pub !== '00') {
+  async created() {
+    if (this.$store.state.keys.pub) {
+      // keys already set up
       this.$store.dispatch('launch')
       this.initializeKeys = false
+    } else {
+      // keys not set up, offer the option to try to get a pubkey from window.nostr
+      setTimeout(() => {
+        if (window.nostr) {
+          this.hasExtension = true
+        }
+      }, 1000)
     }
   },
 
   methods: {
+    async getFromExtension() {
+      try {
+        this.key = await window.nostr.getPublicKey()
+        this.watchOnly = true
+      } catch (err) {
+        this.$q.notify({
+          message: `Failed to get a public key from a Nostr extension: ${err}`,
+          color: 'warning'
+        })
+      }
+    },
+
     generate() {
-      this.key = generateSeedWords()
+      this.key = generatePrivateKey()
+      this.watchOnly = false
     },
 
     proceed() {

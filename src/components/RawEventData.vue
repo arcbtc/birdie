@@ -4,13 +4,14 @@
       <div class="text-lg text-bold tracking-wide leading-relaxed py-2">
         Raw Event Data
       </div>
-      <pre class="font-mono">{{ json(eventWithoutLocalMetadata) }}</pre>
+      <pre class="font-mono">{{ json(cleaned) }}</pre>
     </q-card-section>
   </q-card>
 </template>
 
 <script>
 import helpersMixin from '../utils/mixin'
+import {cleanEvent} from '../utils/helpers'
 
 export default {
   name: 'RawEventData',
@@ -18,9 +19,9 @@ export default {
   props: {event: {type: Object, required: true}},
 
   computed: {
-    eventWithoutLocalMetadata() {
-      let {_id, _rev, ...event} = this.event
-      return event
+    cleaned() {
+      if (Array.isArray(this.event)) return this.event.map(cleanEvent)
+      return cleanEvent(this.event)
     }
   }
 }

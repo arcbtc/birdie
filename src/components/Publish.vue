@@ -2,7 +2,14 @@
   <q-card class="no-shadow py-6 bg-inherit">
     <q-card-section>
       <q-form @submit="sendPost">
-        <q-input v-model="text" dense label="Say something" maxlength="280">
+        <q-input
+          v-model="text"
+          autogrow
+          autofocus
+          label="What's happening?"
+          maxlength="280"
+          @keypress.ctrl.enter="sendPost"
+        >
           <template #before>
             <q-avatar
               round
@@ -22,7 +29,6 @@
             unelevated
             type="submit"
             color="primary"
-            :disable="!$store.state.keys.priv"
           />
         </div>
       </q-form>
@@ -42,9 +48,12 @@ export default {
     }
   },
   methods: {
-    sendPost() {
-      this.$store.dispatch('sendPost', {message: this.text})
-      this.text = ''
+    async sendPost() {
+      if (!this.text.length) {
+        return
+      }
+      let ok = await this.$store.dispatch('sendPost', {message: this.text})
+      if (ok) this.text = ''
     }
   }
 }

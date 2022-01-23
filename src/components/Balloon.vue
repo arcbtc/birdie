@@ -1,9 +1,11 @@
 <template>
   <q-dialog v-model="metadataDialog">
-    <RawEventData :event="event" />
+    <RawEventData :event="sequence" />
   </q-dialog>
 
   <q-chat-message
+    class="text-base font-sans break-words text-justify"
+    style="hyphens: auto !important"
     :class="{invisible}"
     :text="text"
     :name="$store.getters.displayName(event.pubkey)"
@@ -13,6 +15,21 @@
     :bg-color="event.pubkey === $store.state.keys.pub ? 'primary' : 'tertiary'"
     @click="click"
   />
+
+  <q-menu context-menu>
+    <q-list dense>
+      <q-item div class="py-3">
+        <q-item-section>
+          <div class="text-md font-semibold">Seen on relays:</div>
+          <ul class="pl-1 text-sm list-disc">
+            <li v-for="relay in event.seen_on" :key="relay">
+              {{ relay }}
+            </li>
+          </ul>
+        </q-item-section>
+      </q-item>
+    </q-list>
+  </q-menu>
 </template>
 
 <script>
@@ -33,11 +50,12 @@ export default {
   },
 
   computed: {
+    sequence() {
+      return [this.event].concat(this.event.appended).filter(x => x)
+    },
+
     text() {
-      return [this.event]
-        .concat(this.event.appended)
-        .filter(x => x)
-        .map(event => this.getPlaintext(event))
+      return this.sequence.map(event => this.getPlaintext(event))
     }
   },
 

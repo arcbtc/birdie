@@ -21,14 +21,21 @@
 
       <q-form @submit="submitMessage" @reset="text = ''">
         <div class="flex w-full mt-4">
-          <q-input v-model="text" class="w-full" filled>
+          <q-input
+            v-model="text"
+            autofocus
+            class="w-full"
+            filled
+            :disable="!!sending"
+          >
             <template #append>
               <q-btn
                 unelevated
                 class="mx-4"
-                label="Send"
+                :label="sending ? 'Sending' : 'Send'"
                 type="submit"
                 color="secondary"
+                :disable="!!sending"
                 @click="submitMessage"
               />
             </template>
@@ -55,7 +62,9 @@ export default {
       listener: null,
       messages: [],
       canLoadMore: false,
-      text: ''
+      text: '',
+      sending: null,
+      messagesSet: new Set()
     }
   },
 
@@ -83,7 +92,7 @@ export default {
     }px)`
 
     // load peer profile if it exists
-    this.$store.dispatch('useProfile', this.$route.params.pubkey)
+    this.$store.dispatch('useProfile', {pubkey: this.$route.params.pubkey})
 
     // load saved messages and start listening for new ones
     this.restart()
@@ -102,7 +111,11 @@ export default {
 
   methods: {
     async restart() {
+      this.messagesSet = new Set()
       if (this.listener) this.listener.cancel()
+
+      this.$store.commit('haveReadMessage', this.$route.params.pubkey)
+      this.$store.dispatch('useProfile', {pubkey: this.$route.params.pubkey})
       this.messages = await dbGetMessages(this.$route.params.pubkey, 100)
 
       if (this.messages.length > 0) {
@@ -111,6 +124,18 @@ export default {
       }
 
       this.listener = onNewMessage(this.$route.params.pubkey, async event => {
+        this.$store.commit('haveReadMessage', this.$route.params.pubkey)
+        if (this.messagesSet.has(event.id)) return
+        this.messagesSet.add(event.id)
+
+        if (
+          event.pubkey === this.$store.state.keys.pub &&
+          event.created_at === this.sending
+        ) {
+          this.sending = null
+          this.text = ''
+        }
+
         if (this.messages.length === 0) {
           this.messages.push(event)
         } else {
@@ -152,12 +177,14 @@ export default {
     },
 
     async submitMessage() {
+      if (this.sending) return
+
+      this.sending = Math.round(Date.now() / 1000)
       await this.$store.dispatch('sendChatMessage', {
+        now: this.sending,
         pubkey: this.$route.params.pubkey,
         text: this.text
       })
-
-      this.text = ''
     },
 
     async loadMore() {

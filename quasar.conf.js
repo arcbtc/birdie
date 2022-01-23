@@ -11,6 +11,8 @@ const webpack = require('webpack')
 const ESLintPlugin = require('eslint-webpack-plugin')
 const {configure} = require('quasar/wrappers')
 
+const customize = require('./customize.json')
+
 module.exports = configure(function (ctx) {
   return {
     // https://quasar.dev/quasar-cli/supporting-ts
@@ -25,7 +27,7 @@ module.exports = configure(function (ctx) {
     boot: ['global-components'],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
-    css: ['add-tailwind.css'],
+    css: ['add-tailwind.css', '../../node_modules/highlight.js/styles/base16/solarized-light.css'],
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
@@ -75,12 +77,6 @@ module.exports = configure(function (ctx) {
         cfg.plugins.push(
           new webpack.ProvidePlugin({Buffer: ['buffer', 'Buffer']})
         )
-        cfg.plugins.push(
-          new webpack.IgnorePlugin({
-            resourceRegExp: /^\.\/wordlists\/(?!english)/,
-            contextRegExp: /bip39\/src$/
-          })
-        )
         cfg.resolve.alias = cfg.resolve.alias || {}
         cfg.resolve.alias.stream = 'readable-stream'
         cfg.resolve.fallback = cfg.resolve.fallback || {}
@@ -103,7 +99,10 @@ module.exports = configure(function (ctx) {
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
     framework: {
-      config: {},
+      config: {
+        dark: customize.useDarkTheme,
+        brand: customize.colors
+      },
 
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
@@ -117,6 +116,11 @@ module.exports = configure(function (ctx) {
 
       // Quasar plugins
       plugins: ['Notify', 'Dialog']
+    },
+
+    htmlVariables: {
+      name: customize.name,
+      icon: customize.icon
     }
   }
 })
