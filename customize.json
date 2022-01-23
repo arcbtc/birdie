@@ -1,14 +1,14 @@
 {
-  "name": "branle",
+  "name": "Birdie",
   "icon": "/bird.png",
   "colors": {
-    "primary": "#2262ba",
-    "secondary": "#E64A19",
-    "accent": "#0097A7",
+    "primary": "#26a69a",
+    "secondary": "#00d6c2",
+    "accent": "#ccffff",
     "positive": "#21ba45",
-    "negative": "#c10015",
-    "info": "#64DD17",
-    "warning": "#BD6E00"
+    "negative": "#f1948a",
+    "info": "#31ccec",
+    "warning": "#f2c037"
   },
   "useDarkTheme": false
 }
