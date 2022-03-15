@@ -32,7 +32,7 @@
           class="text-xl my-4 font-sans break-words text-justify"
           style="hyphens: auto !important"
         >
-          <Markdown>{{ event.content }}</Markdown>
+          <Markdown>{{ content }}</Markdown>
         </div>
         <div class="flex items-center justify-between w-full">
           <q-icon
@@ -128,7 +128,7 @@ export default {
       event: null,
       eventSub: null,
       childrenThreads: [],
-      childrenSet: new Set(),
+      childrenSeen: new Map(),
       childrenSub: null,
       eventUpdates: null
     }
@@ -143,6 +143,9 @@ export default {
         .filter(([_, prefs]) => prefs.write)
         .map(([url, _]) => url)
         .filter(url => this.event.seen_on.indexOf(url) === -1)
+    },
+    content() {
+      return this.interpolateMentions(this.event.content, this.event.tags)
     }
   },
 
@@ -200,11 +203,6 @@ export default {
           request: true
         })
         this.listenAncestors()
-
-        // only listen for updates in the case we already have this event stored locally
-        this.eventUpdates = await onEventUpdate(this.event.id, event => {
-          this.event = event
-        })
       } else {
         this.eventSub = pool.sub(
           {
@@ -223,12 +221,24 @@ export default {
         )
       }
 
+      // listen to changes to the event in the db so we get .seen_on updates
+      this.eventUpdates = await onEventUpdate(
+        this.$route.params.eventId,
+        event => {
+          // once we get an update from the db we know we can stop listening for relay updates
+          if (this.eventSub) this.eventSub.unsub()
+
+          // and just update our local event with the latest one from the db
+          this.event = event
+        }
+      )
+
       this.listenChildren()
     },
 
     listenChildren() {
       this.childrenThreads = []
-      this.childrenSet = new Set()
+      this.childrenSeen = new Map()
       this.childrenSub = pool.sub(
         {
           filter: [
@@ -237,9 +247,15 @@ export default {
               kinds: [1]
             }
           ],
-          cb: async event => {
-            if (this.childrenSet.has(event.id)) return
-            this.childrenSet.add(event.id)
+          cb: async (event, relay) => {
+            let existing = this.childrenSeen.get(event.id)
+            if (existing) {
+              existing.seen_on.push(relay)
+              return
+            }
+
+            event.seen_on = [relay]
+            this.childrenSeen.set(event.id, event)
 
             this.$store.dispatch('useProfile', {pubkey: event.pubkey})
 

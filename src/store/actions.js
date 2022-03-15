@@ -4,7 +4,8 @@ import {Notify, LocalStorage} from 'quasar'
 
 import {pool, signAsynchronously} from '../pool'
 import {dbSave, dbGetProfile, dbGetContactList} from '../db'
-import {metadataFromEvent} from '../utils/helpers'
+import {processMentions, getPubKeyTagWithRelay} from '../utils/helpers'
+import {metadataFromEvent} from '../utils/event'
 
 export function initKeys(store, keys) {
   store.commit('setKeys', keys)
@@ -144,13 +145,15 @@ export async function sendPost(store, {message, tags = [], kind = 1}) {
 
   let event
   try {
-    event = await pool.publish({
+    const unpublishedEvent = await processMentions({
       pubkey: store.state.keys.pub,
       created_at: Math.floor(Date.now() / 1000),
       kind,
       tags,
       content: message
     })
+
+    event = await pool.publish(unpublishedEvent)
   } catch (err) {
     Notify.create({
       message: `Did not publish: ${err}`,
@@ -165,8 +168,7 @@ export async function sendPost(store, {message, tags = [], kind = 1}) {
   }
 
   store.dispatch('addEvent', {event})
-
-  return true
+  return event
 }
 
 export async function setMetadata(store, metadata) {
@@ -194,7 +196,20 @@ export async function recommendServer(store, url) {
 export async function sendChatMessage(store, {now, pubkey, text, replyTo}) {
   if (text.length === 0) return
 
-  let [ciphertext, iv] = encrypt(store.state.keys.priv, pubkey, text)
+  let ciphertext = '???'
+  try {
+    if (store.state.keys.priv) {
+      ciphertext = encrypt(store.state.keys.priv, pubkey, text)
+    } else if (
+      (await window?.nostr?.getPublicKey?.()) === store.state.keys.pub
+    ) {
+      ciphertext = await window.nostr.nip04.encrypt(pubkey, text)
+    } else {
+      throw new Error('no private key available to encrypt!')
+    }
+  } catch (err) {
+    /***/
+  }
 
   // make event
   let event = {
@@ -202,7 +217,7 @@ export async function sendChatMessage(store, {now, pubkey, text, replyTo}) {
     created_at: now,
     kind: 4,
     tags: [['p', pubkey]],
-    content: ciphertext + '?iv=' + iv
+    content: ciphertext
   }
   if (replyTo) {
     event.tags.push(['e', replyTo])
@@ -319,11 +334,13 @@ export async function publishContactList(store) {
 
   // now we merely add to the existing event because it might contain more data in the
   // tags that we don't want to replace
-  store.state.following.forEach(pubkey => {
-    if (!tags.find(([t, v]) => t === 'p' && v === pubkey)) {
-      tags.push(['p', pubkey])
-    }
-  })
+  await Promise.all(
+    store.state.following.map(async pubkey => {
+      if (!tags.find(([t, v]) => t === 'p' && v === pubkey)) {
+        tags.push(await getPubKeyTagWithRelay(pubkey))
+      }
+    })
+  )
 
   event = await pool.publish({
     pubkey: store.state.keys.pub,

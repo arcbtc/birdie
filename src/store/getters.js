@@ -1,5 +1,15 @@
 import Identicon from 'identicon.js'
 
+export function namedProfiles(state, getters) {
+  return Object.entries(state.profilesCache).reduce(
+    (result, [pubkey, profile]) =>
+      getters.hasName(pubkey)
+        ? [...result, {...profile, pubkey}] // [..., { name, pubkey, nip05, ...}, ...]
+        : result,
+    []
+  )
+}
+
 export function hasName(state) {
   return pubkey => {
     let {name, nip05} = state.profilesCache[pubkey] || {}
@@ -10,9 +20,10 @@ export function hasName(state) {
 export function displayName(state, getters) {
   return pubkey => {
     let {name, nip05} = state.profilesCache[pubkey] || {}
-    return getters.hasName(pubkey)
-      ? nip05 || name
-      : pubkey.slice(0, 3) + '...' + pubkey.slice(-4)
+
+    if (nip05) return nip05.startsWith('_@') ? nip05.slice(2) : nip05
+    if (name) return name
+    return pubkey.slice(0, 3) + '...' + pubkey.slice(-4)
   }
 }
 
@@ -51,4 +62,12 @@ export function hasMoreContacts(state) {
 export function unreadChats(state) {
   delete state.unreadMessages[state.keys.pub]
   return Object.values(state.unreadMessages).filter(v => v).length
+}
+
+export function canSignEventsAutomatically(state) {
+  return Boolean(state.keys.priv || window.nostr)
+}
+
+export function canEncryptDecrypt(state) {
+  return Boolean(state.keys.priv || (window.nostr && window.nostr.nip04))
 }

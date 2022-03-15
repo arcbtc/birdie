@@ -1,6 +1,7 @@
 <template>
   <q-form class="px-24" @submit="sendReply">
     <q-input
+      ref="input"
       v-model="text"
       autogrow
       autofocus
@@ -18,6 +19,7 @@
 
 <script>
 import helpersMixin from '../utils/mixin'
+import {getPubKeyTagWithRelay, getEventTagWithRelay} from '../utils/helpers'
 
 export default {
   mixins: [helpersMixin],
@@ -30,6 +32,23 @@ export default {
     return {
       text: ''
     }
+  },
+
+  computed: {
+    textarea() {
+      return this.$refs.input.$el.querySelector('textarea')
+    },
+    mentions() {
+      return this.createMentionsProvider()
+    }
+  },
+
+  mounted() {
+    this.mentions.attach(this.textarea)
+  },
+
+  beforeUnmount() {
+    this.mentions.detach(this.textarea)
   },
 
   methods: {
@@ -48,30 +67,27 @@ export default {
       // add last 4 pubkeys mentioned
       let pubkeys = usableTags.filter(([t, v]) => t === 'p').map(([_, v]) => v)
       for (let i = 0; i < Math.min(4, pubkeys.length); i++) {
-        tags.push(['p', pubkeys[pubkeys.length - 1 - i]])
+        tags.push(await getPubKeyTagWithRelay(pubkeys[pubkeys.length - 1 - i]))
       }
       // plus the author of the note being replied to, if not present already
       if (!tags.find(([_, v]) => v === this.event.pubkey)) {
-        tags.push(['p', this.event.pubkey])
+        tags.push(await getPubKeyTagWithRelay(this.event.pubkey))
       }
 
       // add the first and the last event ids
       let first = usableTags.find(([t, v]) => t === 'e')
-      if (first) {
-        let [_, v] = first
-        tags.push(['e', v])
-      }
-      tags.push(['e', this.event.id])
+      if (first) tags.push(first)
+      let last = getEventTagWithRelay(this.event)
+      tags.push(last)
 
       // remove ourselves
       tags = tags.filter(([_, v]) => v !== this.$store.state.keys.pub)
 
-      let ok = await this.$store.dispatch('sendPost', {
+      let event = await this.$store.dispatch('sendPost', {
         message: this.text,
         tags
       })
-
-      if (ok) this.text = ''
+      if (event) this.toEvent(event.id)
     }
   }
 }

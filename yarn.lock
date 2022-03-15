@@ -997,15 +997,15 @@
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-0.5.7.tgz#8605d84b34daf43d15c344fae54f0a1d5d5a4632"
   integrity sha512-R9PPYv7TqoYi+enikzZvwRQesGTxR0+jwqzZJGL0uNcf2NFL+lt/uvCCewtXXmr6jWBxiMuNjBfJwKv9UJaCng==
 
-"@noble/secp256k1@^1.3.0":
-  version "1.3.3"
-  resolved "https://registry.yarnpkg.com/@noble/secp256k1/-/secp256k1-1.3.3.tgz#238160421281ffa9afac721361e20d3b8c99322c"
-  integrity sha512-uzKQA9AzoypXGQusSQahpZbNYYnzZblOgr4AjNjI9s3cGy15V+exxmEnjcC6L/slVKMR30NC+srp00Ch6Pm2hg==
-
 "@noble/secp256k1@^1.3.4":
   version "1.3.4"
   resolved "https://registry.yarnpkg.com/@noble/secp256k1/-/secp256k1-1.3.4.tgz#158ded712d09237c0d3428be60dc01ce8ebab9fb"
   integrity sha512-ZVRouDO5mbdCiDg4zCd3ZZABduRtpy4tCnB33Gh9upHe9tRzpiqbRSN1VTjrj/2g8u2c6MBi0YLNnNQpBYOiWg==
+
+"@noble/secp256k1@^1.5.2":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@noble/secp256k1/-/secp256k1-1.5.2.tgz#40399e4fba54f588fda14fc03a4499044fdcab24"
+  integrity sha512-5mzA40W2q55VCRuC9XzmkiEnODdY0c5a7qsK2QcOfI5/MuVQyBaWGQyE6YOEF7kDwp+tDVWGsCDVJUME+wsWWw==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -4470,6 +4470,14 @@ markdown-it-deflist@^2.1.0:
   resolved "https://registry.yarnpkg.com/markdown-it-deflist/-/markdown-it-deflist-2.1.0.tgz#50d7a56b9544cd81252f7623bd785e28a8dcef5c"
   integrity sha512-3OuqoRUlSxJiuQYu0cWTLHNhhq2xtoSFqsZK8plANg91+RJQU1ziQ6lA2LzmFAEes18uPBsHZpcX6We5l76Nzg==
 
+markdown-it-highlightjs@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/markdown-it-highlightjs/-/markdown-it-highlightjs-3.6.0.tgz#b567408c633d71e5e4cc33e1d0121a44447d2f29"
+  integrity sha512-ex+Lq3cVkprh0GpGwFyc53A/rqY6GGzopPCG1xMsf8Ya3XtGC8Uw9tChN1rWbpyDae7tBBhVHVcMM29h4Btamw==
+  dependencies:
+    highlight.js "^11.3.1"
+    lodash.flow "^3.5.0"
+
 markdown-it-sub@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/markdown-it-sub/-/markdown-it-sub-1.0.0.tgz#375fd6026eae7ddcb012497f6411195ea1e3afe8"
@@ -4484,13 +4492,6 @@ markdown-it-task-lists@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/markdown-it-task-lists/-/markdown-it-task-lists-2.1.1.tgz#f68f4d2ac2bad5a2c373ba93081a1a6848417088"
   integrity sha512-TxFAc76Jnhb2OUu+n3yz9RMu4CwGfaT788br6HhEDlvWfdeJcLUsxk1Hgw2yJio0OXsxv7pyIPmvECY7bMbluA==
-markdown-it-highlightjs@^3.6.0:
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/markdown-it-highlightjs/-/markdown-it-highlightjs-3.6.0.tgz#b567408c633d71e5e4cc33e1d0121a44447d2f29"
-  integrity sha512-ex+Lq3cVkprh0GpGwFyc53A/rqY6GGzopPCG1xMsf8Ya3XtGC8Uw9tChN1rWbpyDae7tBBhVHVcMM29h4Btamw==
-  dependencies:
-    highlight.js "^11.3.1"
-    lodash.flow "^3.5.0"
 
 markdown-it@^12.3.0:
   version "12.3.0"
@@ -4806,13 +4807,13 @@ normalize-url@^6.0.1:
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-6.1.0.tgz#40d0885b535deffe3f3147bec877d05fe4c5668a"
   integrity sha512-DlL+XwOy3NxAQ8xuC0okPgK46iuVNAK01YN7RueYBqqFeGsBjV9XmCAzAdgt+667bCl5kPh9EqKKDwnaPG1I7A==
 
-nostr-tools@^0.20.1:
-  version "0.20.1"
-  resolved "https://registry.yarnpkg.com/nostr-tools/-/nostr-tools-0.20.1.tgz#440b9b4328a6e6e09c283d917c064f241c28a0e6"
-  integrity sha512-S3JpQmX87h4MzP801OV8l5djp/2bNJC8pG4yBBmeTY/eWM8IrV15lFvTwxZLoW+O2s3mahli1VetqKEI1Ex3Fg==
+nostr-tools@^0.22.1:
+  version "0.22.1"
+  resolved "https://registry.yarnpkg.com/nostr-tools/-/nostr-tools-0.22.1.tgz#ad4048d8e9b6d3d658bbe2a0753f75a84c860f2b"
+  integrity sha512-uGSp246JlqjiHQr2RahfOxvSJ4jGPgqKjiyb/YkEM55CriVVF1ISNmpfc7bFchIvPSFhWoWouGqXwqNpoHXdbw==
   dependencies:
     "@noble/hashes" "^0.5.7"
-    "@noble/secp256k1" "^1.3.0"
+    "@noble/secp256k1" "^1.5.2"
     browserify-cipher ">=1"
     buffer ">=5"
     create-hash "^1.2.0"
@@ -6629,6 +6630,11 @@ totalist@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/totalist/-/totalist-1.1.0.tgz#a4d65a3e546517701e3e5c37a47a70ac97fe56df"
   integrity sha512-gduQwd1rOdDMGxFG1gEvhV88Oirdo2p+KjoYFU7k2g+i7n6AFFbDQ5kMPUsW0pNbfQsB/cwXvT1i4Bue0s9g5g==
+
+tributejs@^5.1.3:
+  version "5.1.3"
+  resolved "https://registry.yarnpkg.com/tributejs/-/tributejs-5.1.3.tgz#980600fc72865be5868893078b4bfde721129eae"
+  integrity sha512-B5CXihaVzXw+1UHhNFyAwUTMDk1EfoLP5Tj1VhD9yybZ1I8DZJEv8tZ1l0RJo0t0tk9ZhR8eG5tEsaCvRigmdQ==
 
 trim-left-x@^3.0.0:
   version "3.0.0"

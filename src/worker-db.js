@@ -5,7 +5,7 @@ import PouchDBUpsert from 'pouchdb-upsert'
 import PouchDBMapReduce from 'pouchdb-mapreduce'
 import PouchDBAdapterIDB from 'pouchdb-adapter-idb'
 
-import {cleanEvent} from './utils/helpers'
+import {cleanEvent} from './utils/event'
 
 PouchDB.plugin(PouchDBAdapterIDB).plugin(PouchDBMapReduce).plugin(PouchDBUpsert)
 
@@ -18,7 +18,7 @@ const db = new PouchDB('nostr-events', {
 
 // db schema (views)
 // ~
-const DESIGN_VERSION = 4
+const DESIGN_VERSION = 7
 db.upsert('_design/main', current => {
   if (current && current.version >= DESIGN_VERSION) return false
 

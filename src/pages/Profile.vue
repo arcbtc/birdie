@@ -77,7 +77,7 @@
 
       <div class="flex justify-end">
         <q-btn
-          :disable="!$store.state.keys.priv"
+          :disable="!$store.getters.canEncryptDecrypt"
           round
           flat
           :to="'/messages/' + $route.params.pubkey"
@@ -88,7 +88,7 @@
         />
         <q-btn
           v-if="isFollowing"
-          :disable="!$store.state.keys.priv"
+          :disable="!$store.getters.canSignEventsAutomatically"
           round
           unelevated
           flat
@@ -99,7 +99,7 @@
         />
         <q-btn
           v-if="!isFollowing"
-          :disable="!$store.state.keys.priv"
+          :disable="!$store.getters.canSignEventsAutomatically"
           round
           unelevated
           color="primary"
@@ -160,6 +160,29 @@ export default {
 
   methods: {
     start() {
+      if (this.$route.params.pubkey.toLowerCase().match(/^[0-9a-f]{64}$/)) {
+        // ok, it's a pubkey, the default cause
+      } else if (
+        this.$route.params.pubkey
+          .toLowerCase()
+          .match(/^web\+nostr:[0-9a-f]{64}$/)
+      ) {
+        // it's a web+nostr pubkey link
+        this.$router.push('/' + this.$route.params.pubkey.slice(-64))
+        return
+      } else if (
+        this.$route.params.pubkey
+          .toLowerCase()
+          .match(/^web\+nostr:event:[0-9a-f]{64}$/)
+      ) {
+        // it's a web+nostr event link
+        this.$router.push('/event/' + this.$route.params.pubkey.slice(-64))
+        return
+      } else {
+        // it's something we don't understand
+        return
+      }
+
       this.$store.dispatch('useProfile', {pubkey: this.$route.params.pubkey})
       this.$store.dispatch('useContacts', this.$route.params.pubkey)
       this.listen()

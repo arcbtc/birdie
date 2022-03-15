@@ -3,6 +3,7 @@
     <q-card-section>
       <q-form @submit="sendPost">
         <q-input
+          ref="input"
           v-model="text"
           autogrow
           autofocus
@@ -44,16 +45,34 @@ export default {
 
   data() {
     return {
-      text: ''
+      text: '',
     }
   },
+
+  computed: {
+    textarea() {
+      return this.$refs.input.$el.querySelector('textarea')
+    },
+    mentions() {
+      return this.createMentionsProvider()
+    }
+  },
+
+  mounted() {
+    this.mentions.attach(this.textarea)
+  },
+
+  beforeUnmount() {
+    this.mentions.detach(this.textarea)
+  },
+
   methods: {
     async sendPost() {
       if (!this.text.length) {
         return
       }
-      let ok = await this.$store.dispatch('sendPost', {message: this.text})
-      if (ok) this.text = ''
+      let event = await this.$store.dispatch('sendPost', {message: this.text})
+      if (event) this.toEvent(event.id)
     }
   }
 }

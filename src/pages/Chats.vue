@@ -25,7 +25,7 @@
           </q-badge>
         </q-item-section>
         <q-item-section>
-          {{ $store.getters.displayName(chat.peer) }}
+          <Name :pubkey="chat.peer" fallback />
         </q-item-section>
         <q-item-section side>
           {{ niceDate(chat.lastMessage) }}
@@ -59,6 +59,9 @@ export default {
 
   async mounted() {
     this.chats = await dbGetChats(this.$store.state.keys.pub)
+    this.chats.forEach(({peer}) =>
+      this.$store.dispatch('useProfile', {pubkey: peer})
+    )
   }
 }
 </script>
