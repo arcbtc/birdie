@@ -19,6 +19,11 @@ const routes = [
         name: 'settings'
       },
       {
+        path: '/nostr',
+        component: () => import('pages/Nostr.vue'),
+        name: 'nostr'
+      },
+      {
         path: '/messages',
         component: () => import('pages/Chats.vue'),
         name: 'messages'
