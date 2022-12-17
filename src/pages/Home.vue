@@ -1,81 +1,102 @@
 <template>
-  <q-page class="px-4 pt-6">
-    <div v-if="$store.getters.hasName($store.state.keys.pub)" class="text-xl">Hello <Name :pubkey="$store.state.keys.pub" /></div>
-    <div v-else class="text-xl">Home</div>
+  <q-page class="px-4 py-6">
+    <div class="text-xl">What is Nostr?</div>
+    <div class="text-lg q-pt-lg">A decentralized network based on cryptographic keypairs and that is not peer-to-peer, it is super simple and scalable and therefore has a chance of working. Read more about the <a href="https://github.com/nostr-protocol/nostr">protocol</a>. You can also reach us at our <a href="https://t.me/nostr_protocol">Telegram group</a> (while we don't have a decent group chat application fully working on Nostr).</div>
+    <div class="text-xl q-pb-lg q-pt-lg">Great Nostr projects</div>
 
-    <Publish />
-
-    <q-infinite-scroll :disable="reachedEnd" :offset="150" @load="loadMore">
-      <Thread v-for="thread in homeFeed" :key="thread[0].id" :events="thread" />
-    </q-infinite-scroll>
+<div class="row q-col-gutter-md">
+  <div
+    v-for="project in projects"
+    :key="project.image"
+    class="col-6 col-lg-4 col-lg-3"
+  >
+   <a :href="project.link"><q-card class="my-card">
+      <q-img :src="project.image">
+        <div class="absolute-bottom">
+          <div class="text-h6">{{project.name}}</div>
+          <div class="text-subtitle2">{{project.description}}</div>
+        </div>
+      </q-img>
+    </q-card></a>
+</div></div>
   </q-page>
 </template>
 
 <script>
+
 import helpersMixin from '../utils/mixin'
-import {addToThread} from '../utils/threads'
-import {dbGetHomeFeedNotes, onNewHomeFeedNote} from '../db'
 
 export default {
-  name: 'Home',
+  name: 'Settings',
   mixins: [helpersMixin],
 
   data() {
     return {
-      listener: null,
-      reachedEnd: false,
-      homeFeed: [],
-      notesSet: new Set()
+      projects: [
+      {
+        'name': 'Awesome NOSTR',
+        'description': 'Collection of great NOSTR things',
+        'image': '/awesome_nostr.png',
+        'link': 'https://github.com/aljazceru/awesome-nostr'
+      },
+      {
+        'name': 'Anigma',
+        'description': 'Telegram like client',
+        'image': '/anigma.png',
+        'link': 'https://anigma.io'
+      },
+      {
+        'name': 'Damus',
+        'description': 'A twitter-like nostr client for iPhone, iPad and MacOS.',
+        'image': '/damus.png',
+        'link': 'https://github.com/damus-io/damus'
+      },
+      {
+        'name': 'Branle',
+        'description': 'A twitter type nostr web client',
+        'image': 'branle.png',
+        'link': 'https://github.com/fiatjaf/branle'
+      },
+      {
+        'name': 'Nvote',
+        'description': 'Reddit/HackerNews NOSTR client',
+        'image': 'nvote.png',
+        'link': 'https://github.com/rdbell/nvote'
+      },
+      {
+        'name': 'Nostr Gateway',
+        'description': 'Pull Nostr data from relays',
+        'image': 'gateway.png',
+        'link': 'https://gateway.nostr.com'
+      },
+      {
+        'name': 'Nostr.ch',
+        'description': 'Nostr web client',
+        'image': 'nostrch.png',
+        'link': 'https://nostr.ch'
+      },
+      {
+        'name': 'Jester',
+        'description': 'Chess over nostr',
+        'image': 'jester.png',
+        'link': 'Jester - Chess over nostr'
+      },
+      {
+        'name': 'Nostros',
+        'description': 'Nostr mobile client',
+        'image': 'nostros.png',
+        'link': 'https://github.com/KoalaSat/nostros'
+      }
+    ]
     }
   },
-
-  async mounted() {
-    let notes = await dbGetHomeFeedNotes(50)
-    if (notes.length > 0) {
-      this.reachedEnd = false
-    }
-
-    for (let i = notes.length - 1; i >= 0; i--) {
-      addToThread(this.homeFeed, notes[i])
-      this.notesSet.add(notes[i].id)
-    }
-
-    this.listener = onNewHomeFeedNote(event => {
-      if (this.notesSet.has(event.id)) return
-
-      addToThread(this.homeFeed, event)
-      this.notesSet.add(event.id)
-    })
-  },
-
-  async beforeUnmount() {
-    if (this.listener) this.listener.cancel()
-  },
-
-  methods: {
-    async loadMore(_, done) {
-      if (this.homeFeed.length === 0) {
-        this.reachedEnd = true
-        done()
-        return
-      }
-
-      let loadedNotes = await dbGetHomeFeedNotes(
-        50,
-        Math.min.apply(
-          Math,
-          this.homeFeed.flat().map(event => event.created_at)
-        ) - 1
-      )
-      if (loadedNotes.length === 0) {
-        this.reachedEnd = true
-      }
-      for (let i = loadedNotes.length - 1; i >= 0; i--) {
-        addToThread(this.homeFeed, loadedNotes[i])
-        this.notesSet.add(event.id)
-      }
-      done()
-    }
+  mounted() {
+    console.log('this.projects')
+    console.log(this.projects)
+    console.log('this.projects')
+    fetch('../utils.nostrprojects.json')
+      .then((response) => response.json())
+      .then((json) => console.log(json))
   }
 }
 </script>

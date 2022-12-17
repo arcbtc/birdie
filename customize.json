@@ -1,6 +1,6 @@
 {
-  "name": "Birdie (NOSTR web twitter-like client)",
-  "icon": "/bird.png",
+  "name": "Nostr",
+  "icon": "/nostr.png",
   "colors": {
     "primary": "#26a69a",
     "secondary": "#00d6c2",

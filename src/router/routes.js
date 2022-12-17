@@ -9,6 +9,11 @@ const routes = [
         name: 'home'
       },
       {
+        path: '/thread',
+        component: () => import('pages/Thread.vue'),
+        name: 'thread'
+      },
+      {
         path: '/follow',
         component: () => import('pages/SearchFollow.vue'),
         name: 'follow'
@@ -17,11 +22,6 @@ const routes = [
         path: '/settings',
         component: () => import('pages/Settings.vue'),
         name: 'settings'
-      },
-      {
-        path: '/nostr',
-        component: () => import('pages/Nostr.vue'),
-        name: 'nostr'
       },
       {
         path: '/messages',
