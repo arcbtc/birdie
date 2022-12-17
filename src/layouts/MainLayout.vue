@@ -12,6 +12,18 @@
             />
           </q-card-section>
           <q-list class="text-slate-700">
+          <q-item v-ripple clickable to="/nostr" active-class="">
+              <q-item-section avatar>
+                <q-icon name="circle" color="secondary" />
+              </q-item-section>
+
+              <q-item-section
+                :class="{'text-primary': $route.name === 'nostr'}"
+              >
+                NOSTR THINGS
+              </q-item-section>
+            </q-item>
+
             <q-item v-ripple clickable to="/" active-class="">
               <q-item-section avatar>
                 <q-icon name="home" color="secondary" />
@@ -128,17 +140,7 @@
 
             </q-item>
 
-            <q-item v-ripple clickable to="/nostr" active-class="">
-              <q-item-section avatar>
-                <q-icon name="circle" color="secondary" />
-              </q-item-section>
-
-              <q-item-section
-                :class="{'text-primary': $route.name === 'nostr'}"
-              >
-                NOSTR THINGS
-              </q-item-section>
-            </q-item>
+            
           </q-list>
         </q-card>
       </div>
@@ -165,6 +167,12 @@
         text-secondary
       "
     >
+    <q-route-tab
+        icon="circle"
+        to="/nostr"
+        active-class=""
+        :class="{'text-primary': $route.name === 'nostr'}"
+      />
       <q-route-tab
         icon="home"
         to="/"
@@ -223,12 +231,6 @@
         to="/settings"
         active-class=""
         :class="{'text-primary': $route.name === 'settings'}"
-      />
-       <q-route-tab
-        icon="circle"
-        to="/nostr"
-        active-class=""
-        :class="{'text-primary': $route.name === 'nostr'}"
       />
     </q-tabs>
 

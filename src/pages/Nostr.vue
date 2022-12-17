@@ -50,16 +50,16 @@ export default {
         'link': 'https://github.com/damus-io/damus'
       },
       {
-        'name': 'Awesome NOSTR',
-        'description': 'Collection of great NOSTR things',
-        'image': '../images/awesome_nostr.png',
-        'link': 'https://github.com/aljazceru/awesome-nostr'
+        'name': 'Branle',
+        'description': 'A twitter type nostr web client',
+        'image': 'branle.png',
+        'link': 'https://github.com/fiatjaf/branle'
       },
       {
-        'name': 'Anigma',
-        'description': 'Telegram like client',
-        'image': '../images/anigma.png',
-        'link': 'https://anigma.io'
+        'name': 'Nvote',
+        'description': 'Reddit/HackerNews NOSTR client',
+        'image': 'nvote.png',
+        'link': 'https://github.com/rdbell/nvote'
       },
       {
         'name': 'Anigma',
