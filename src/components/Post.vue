@@ -23,7 +23,6 @@
       </q-avatar>
       <div v-if="showVerticalLineBottom" class="has-reply"></div>
     </q-item-section>
-
     <q-item-section>
       <q-item-label lines="1" class="flex justify-between items-center">
         <div class="flex items-center">
@@ -31,6 +30,38 @@
           <div class="text-accent font-mono text-xs">
             {{ shorten(event.pubkey) }}
           </div>
+          <q-btn
+          :disable="!$store.getters.canEncryptDecrypt"
+          round
+          flat
+          :to="'/messages/' + $route.params.pubkey"
+          unelevated
+          color="primary"
+          icon="message"
+          size="xs"
+        ><q-tooltip>Direct message</q-tooltip></q-btn>
+        <q-btn
+          v-if="isFollowing"
+          :disable="!$store.getters.canSignEventsAutomatically"
+          round
+          unelevated
+          flat
+          color="secondary"
+          icon="cancel"
+          size="xs"
+          @click="unfollow"
+        ><q-tooltip>Unfollow</q-tooltip></q-btn>
+        <q-btn
+          v-if="!isFollowing"
+          :disable="!$store.getters.canSignEventsAutomatically"
+          round
+          unelevated
+          color="primary"
+          flat
+          icon="add_circle"
+          size="xs"
+          @click="follow"
+        ><q-tooltip>Follow</q-tooltip></q-btn>
         </div>
         <div class="flex items-center">
           <q-icon
@@ -77,6 +108,7 @@
         <Recommend v-else-if="event.kind === 2" :url="event.content" />
       </q-item-label>
     </q-item-section>
+
   </q-item>
 </template>
 
@@ -99,6 +131,9 @@ export default {
   },
 
   computed: {
+    isFollowing() {
+      return this.$store.state.following.includes(this.$route.params.pubkey)
+    },
     tagged() {
       for (let i = this.event.tags.length - 1; i >= 0; i--) {
         let tag = this.event.tags[i]
@@ -137,6 +172,12 @@ export default {
 
       if (this.clicking) this.toEvent(this.event.id)
     },
+    unfollow() {
+      this.$store.commit('unfollow', this.$route.params.pubkey)
+    },
+    follow() {
+      this.$store.commit('follow', this.$route.params.pubkey)
+    }
   }
 }
 </script>

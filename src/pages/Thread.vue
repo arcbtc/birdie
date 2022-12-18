@@ -30,7 +30,7 @@ export default {
   },
 
   async mounted() {
-    let notes = await dbGetHomeFeedNotes(50)
+    let notes = await dbGetHomeFeedNotes()
     if (notes.length > 0) {
       this.reachedEnd = false
     }
@@ -41,7 +41,7 @@ export default {
     }
 
     this.listener = onNewHomeFeedNote(event => {
-      if (this.notesSet.has(event.id)) return
+      if (this.notesSet.has(event.id)) returnonNewHomeFeedNote
 
       addToThread(this.homeFeed, event)
       this.notesSet.add(event.id)
@@ -60,16 +60,8 @@ export default {
         return
       }
 
-      let loadedNotes = await dbGetHomeFeedNotes(
-        50,
-        Math.min.apply(
-          Math,
-          this.homeFeed.flat().map(event => event.created_at)
-        ) - 1
-      )
-      if (loadedNotes.length === 0) {
-        this.reachedEnd = true
-      }
+      let loadedNotes = await dbGetHomeFeedNotes()
+
       for (let i = loadedNotes.length - 1; i >= 0; i--) {
         addToThread(this.homeFeed, loadedNotes[i])
         this.notesSet.add(event.id)

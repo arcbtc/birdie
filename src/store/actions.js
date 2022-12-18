@@ -87,7 +87,10 @@ export function restartMainSubscription(store) {
           kinds: [1, 4],
           '#p': [store.state.keys.pub]
         },
-
+        {
+          kinds: [1],
+          filter: {since: Math.round(Date.now() / 100)}
+        },
         // our own direct messages to other people
         {
           kinds: [4],
@@ -102,33 +105,8 @@ export function restartMainSubscription(store) {
             break
           case 2:
             break
-          case 3: {
-            if (event.pubkey === store.state.keys.pub) {
-              // we got a new contact list from ourselves
-              // we must update our local relays and following lists
-              // if we don't have any local lists yet
-              let local = await dbGetContactList(store.state.keys.pub)
-              if (!local || local.created_at < event.created_at) {
-                var relays, following
-                try {
-                  relays = JSON.parse(event.content)
-                  store.commit('setRelays', relays)
-                } catch (err) {
-                  /***/
-                }
-
-                following = event.tags
-                  .filter(([t, v]) => t === 'p' && v)
-                  .map(([_, v]) => v)
-                store.commit('setFollowing', following)
-
-                following.forEach(f =>
-                  store.dispatch('useProfile', {pubkey: f})
-                )
-              }
-            }
+          case 3: 
             break
-          }
           case 4:
             break
         }

@@ -50,10 +50,8 @@ export async function dbSave(event, relay) {
   return call('dbSave', [event, relay])
 }
 export async function dbGetHomeFeedNotes(
-  limit = 50,
-  since = Math.round(Date.now() / 1000)
 ) {
-  return call('dbGetHomeFeedNotes', [limit, since])
+  return eventsSaved
 }
 export function onNewHomeFeedNote(callback = () => {}) {
   return stream('onNewHomeFeedNote', [], callback)
