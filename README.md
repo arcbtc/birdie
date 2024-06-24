@@ -4,7 +4,7 @@ A very slightly changed fork off https://github.com/fiatjaf/branle, which was a 
 
 Feel free to use <a href="https://nostr.com">nostr.com</a>, or run yourself.
 
-> nostr.com is just a dot com with the protocols name. The nostr protocol is very diverse and can do much more than just twitter. Read more <a href="https://github.com/fiatjaf/nostr">here</a> 
+> nostr.com is just a dot com with the protocols name. The nostr protocol is very diverse and can do much more than just twitter. Read more <a href="https://github.com/fiatjaf/nostr">here</a>
 
 ## Installation
 
@@ -18,6 +18,8 @@ sudo apt update && sudo apt install yarn
 
 yarn
 ```
+
+[nvm](https://github.com/nvm-sh/nvm#intro) is suppported but not required
 
 #### Install Quasar
 
